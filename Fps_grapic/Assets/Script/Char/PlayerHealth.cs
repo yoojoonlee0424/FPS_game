@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -28,7 +29,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
-        Time.timeScale = 0f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 }
