@@ -2,15 +2,24 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.AI;
 using System.Linq;
-using Unity.VisualScripting;
-using System.Diagnostics.Tracing;
+
+
 
 public class Enemy : MonoBehaviour
 {
     public int health = 100;
     public int damageHit;
 
+    public GameObject bulletPrefab;
+    public Transform bulletSpwanPoint;
+    public GameObject WeaponFlash;
+    public float bloom;
+    public float fireRate;
+    public float lastShotTime = 0f;
+
     public Material hitMat;
+
+    public GameObject EnemyBody;
 
     private Rigidbody rb;
     private Renderer rend;
@@ -82,7 +91,8 @@ public class Enemy : MonoBehaviour
 
 
         rb.freezeRotation = true;
-        transform.rotation = Quaternion.Euler(transform.rotation.x,transform.rotation.y, transform.rotation.z + 90f);
+        transform.rotation = Quaternion.Euler(transform.rotation.x,transform.rotation.y, transform.rotation.z +90f);
+        EnemyBody.SetActive(false);
         this.enabled = false;
     }
 
@@ -124,7 +134,7 @@ public class Enemy : MonoBehaviour
 
     private void LookForPlayer()
     {
-        Vector3 directionToPlayer = playerTransform.position = transform.position;
+        Vector3 directionToPlayer = playerTransform.position - transform.position;
 
         if(Physics.Raycast(transform.position, directionToPlayer, out RaycastHit hit, maxVisionDistance))
         {
@@ -181,6 +191,10 @@ public class Enemy : MonoBehaviour
         idleTimeCounter = idleTime;
         agent.ResetPath();
 
+
+        Shoot();
+
+
         if(Vector3.Distance(transform.position, playerTransform.position) > attackDistance || !canSeePlayer)
         {
             if(health < minChasingHealth)
@@ -235,6 +249,27 @@ public class Enemy : MonoBehaviour
     }
 
 
+    private void Shoot()
+    {
+        if(Time.time > lastShotTime + fireRate)
+        {
+            Vector3 directionToPlayer = playerTransform.position - transform.position;
+            directionToPlayer.Normalize();
 
+            Quaternion bulletRotation = Quaternion.LookRotation(directionToPlayer);
+
+            float maxInaccuracy = 10f;
+            float currentInaccuracy = bloom * maxInaccuracy;
+            float randomJaw = Random.Range(-currentInaccuracy, currentInaccuracy);
+            float randomPitch = Random.Range(-currentInaccuracy, currentInaccuracy);
+
+            bulletRotation *= Quaternion.Euler(randomPitch, randomJaw + 90, 0f);
+
+            Instantiate(bulletPrefab, bulletSpwanPoint.position, bulletRotation);
+            Instantiate(WeaponFlash, bulletSpwanPoint.position, bulletSpwanPoint.rotation);
+            lastShotTime = Time.time;
+
+        }
+    }
 
 }

@@ -1,9 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework.Internal;
-using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using static PlayerModel;
 
@@ -101,6 +95,13 @@ public class PlayerController : MonoBehaviour
         }
 
 
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+
+
+
     }
 
     private void Update()
@@ -112,7 +113,11 @@ public class PlayerController : MonoBehaviour
 
 
 
-        if(!isSprinting)
+
+
+
+
+        if (!isSprinting)
         {
             if (Mathf.Abs(input_Movement.x) > 0 || Mathf.Abs(input_Movement.y) > 0)
             {
@@ -149,6 +154,10 @@ public class PlayerController : MonoBehaviour
         newCamRotation.x = Mathf.Clamp(newCamRotation.x, viewClampYmin, viewClampYmax);
 
         camHolder.localRotation = Quaternion.Euler(newCamRotation);
+
+        
+
+
     }
 
 
